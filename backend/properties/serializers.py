@@ -30,7 +30,7 @@ class PropertySerializer(serializers.ModelSerializer):
     uploaded_images = serializers.ListField(
         child=serializers.ImageField(),
         write_only=True,
-        required=False,
+        required=True,
         min_length=5,
         max_length=10
     )

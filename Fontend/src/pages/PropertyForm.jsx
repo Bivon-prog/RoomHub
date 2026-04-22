@@ -31,24 +31,51 @@ export default function PropertyForm() {
 
   async function onSubmit(data) {
     try {
+      // For new properties, require minimum 5 images
+      if (!isEdit && images.length < 5) {
+        toast.error('Please upload at least 5 images for the property.')
+        return
+      }
+
       data.amenities = selectedAmenities
       data.property_type = user.role === 'landlord' ? 'rental' : 'sale'
-      const res = isEdit
-        ? await api.patch(`/properties/${id}/`, data)
-        : await api.post('/properties/', data)
-
-      // upload images
-      for (const file of images) {
-        const fd = new FormData()
-        fd.append('property', res.data.id)
-        fd.append('image', file)
-        await api.post('/properties/images/', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+      
+      let res
+      if (isEdit) {
+        res = await api.patch(`/properties/${id}/`, data)
+        // For edits, upload new images if any
+        for (const file of images) {
+          const fd = new FormData()
+          fd.append('property', res.data.id)
+          fd.append('image', file)
+          await api.post('/properties/images/', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+        }
+      } else {
+        // For new properties, include images in the initial request
+        const formData = new FormData()
+        
+        // Add all form fields
+        Object.entries(data).forEach(([key, value]) => {
+          if (key === 'amenities' && Array.isArray(value)) {
+            value.forEach(item => formData.append('amenities', item))
+          } else {
+            formData.append(key, value)
+          }
+        })
+        
+        // Add images to form data - each as a separate file
+        images.forEach(file => formData.append('uploaded_images', file))
+        
+        res = await api.post('/properties/', formData, { 
+          headers: { 'Content-Type': 'multipart/form-data' } 
+        })
       }
 
       toast.success(isEdit ? 'Property updated!' : 'Property listed!')
       navigate(user.role === 'landlord' ? '/landlord/dashboard' : '/seller/dashboard')
     } catch (err) {
-      toast.error('Failed to save property.')
+      const errorMsg = err.response?.data?.uploaded_images || err.response?.data?.detail || 'Failed to save property.'
+      toast.error(Array.isArray(errorMsg) ? errorMsg.join(' ') : errorMsg)
     }
   }
 
@@ -107,9 +134,10 @@ export default function PropertyForm() {
         </div>
 
         <div className="form-group">
-          <label>Images (min 5 recommended)</label>
+          <label>Images (minimum 5 required)</label>
           <input type="file" multiple accept="image/*" onChange={e => setImages(Array.from(e.target.files))} />
-          {images.length > 0 && <p>{images.length} image(s) selected</p>}
+          {images.length > 0 && <p>{images.length} image(s) selected {images.length < 5 && <span className="text-error">- Need at least 5</span>}</p>}
+          {images.length === 0 && <p className="text-error">Please upload at least 5 images</p>}
         </div>
 
         <button type="submit" className="btn-primary btn-full" disabled={isSubmitting}>
