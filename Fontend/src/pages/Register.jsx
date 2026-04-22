@@ -63,7 +63,7 @@ export default function Register() {
 
         <div className="form-group">
           <label>Password</label>
-          <input type="password" {...register('password', { required: true, minLength: 8 })} placeholder="Password" />
+          <input type="password" {...register('password', { required: true, minLength: 6 })} placeholder="Password (min 6 characters)" />
         </div>
 
         <div className="form-group">

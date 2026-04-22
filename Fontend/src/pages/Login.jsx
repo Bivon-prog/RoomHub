@@ -14,8 +14,9 @@ export default function Login() {
       toast.success('Welcome back!')
       // redirect based on role stored in context after login
       navigate('/dashboard')
-    } catch {
-      toast.error('Invalid username or password.')
+    } catch (err) {
+      const errorMsg = err.response?.data?.detail || err.response?.data?.message || 'Invalid username or password.'
+      toast.error(errorMsg)
     }
   }
 

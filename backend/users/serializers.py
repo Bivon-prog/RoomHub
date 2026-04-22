@@ -1,10 +1,9 @@
 from rest_framework import serializers
-from django.contrib.auth.password_validation import validate_password
 from .models import User
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, validators=[validate_password])
+    password = serializers.CharField(write_only=True, min_length=6)
     password2 = serializers.CharField(write_only=True)
 
     class Meta:
@@ -14,6 +13,10 @@ class RegisterSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({'password': 'Passwords do not match.'})
+        
+        if len(attrs['password']) < 6:
+            raise serializers.ValidationError({'password': 'Password must be at least 6 characters long.'})
+        
         return attrs
 
     def create(self, validated_data):
