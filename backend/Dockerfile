@@ -7,12 +7,15 @@ ENV PYTHONUNBUFFERED 1
 # Set working directory
 WORKDIR /app
 
-# Copy requirements and pre-downloaded wheels
-COPY requirements.txt /app/
-COPY wheels /app/wheels
+# Install system dependencies (required for Postgres client library compilation)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install packages offline from the local wheels directory
-RUN pip install --no-cache-dir --no-index --find-links=/app/wheels -r requirements.txt
+# Install python dependencies
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend codebase
 COPY . /app/
