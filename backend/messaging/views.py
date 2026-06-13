@@ -20,7 +20,7 @@ class ConversationView(generics.ListAPIView):
     def get_queryset(self):
         other_id = self.kwargs['user_id']
         user = self.request.user
-        qs = Message.objects.filter(
+        qs = Message.objects.select_related('sender', 'receiver').filter(
             Q(sender=user, receiver_id=other_id) |
             Q(sender_id=other_id, receiver=user)
         )
@@ -35,7 +35,7 @@ class InboxView(APIView):
 
     def get(self, request):
         user = request.user
-        messages = Message.objects.filter(
+        messages = Message.objects.select_related('sender', 'receiver').filter(
             Q(sender=user) | Q(receiver=user)
         ).order_by('-created_at')
 

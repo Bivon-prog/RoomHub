@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./backend
+    container_name: roomhub_backend
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - DEBUG=False
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    expose:
+      - "8000"
+    command: >
+      sh -c "python manage.py collectstatic --no-input &&
+             python manage.py migrate &&
+             gunicorn core.wsgi:application --bind 0.0.0.0:8000"
+
+  web:
+    build: ./Fontend
+    container_name: roomhub_frontend
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    depends_on:
+      - api
+
+volumes:
+  static_volume:
+  media_volume:

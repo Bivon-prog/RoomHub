@@ -66,7 +66,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 _db_url = os.environ.get('DIRECT_URL') or os.environ.get('DATABASE_URL')
 
 if _db_url:
-    DATABASES = {'default': dj_database_url.parse(_db_url)}
+    DATABASES = {'default': dj_database_url.parse(_db_url, conn_max_age=60)}
 else:
     # Fallback to SQLite for local dev (set DB URLs in .env for Supabase)
     DATABASES = {
@@ -84,6 +84,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'static'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 

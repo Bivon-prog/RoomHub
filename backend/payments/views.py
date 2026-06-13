@@ -15,8 +15,8 @@ class PaymentListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         if user.role == 'landlord':
-            return Payment.objects.filter(unit__property__owner=user)
-        return Payment.objects.filter(tenant=user)
+            return Payment.objects.select_related('tenant', 'unit__property').filter(unit__property__owner=user)
+        return Payment.objects.select_related('tenant', 'unit__property').filter(tenant=user)
 
 
 class PaymentDetailView(generics.RetrieveAPIView):
@@ -26,8 +26,8 @@ class PaymentDetailView(generics.RetrieveAPIView):
     def get_queryset(self):
         user = self.request.user
         if user.role == 'landlord':
-            return Payment.objects.filter(unit__property__owner=user)
-        return Payment.objects.filter(tenant=user)
+            return Payment.objects.select_related('tenant', 'unit__property').filter(unit__property__owner=user)
+        return Payment.objects.select_related('tenant', 'unit__property').filter(tenant=user)
 
 
 class VerifyPaymentView(generics.UpdateAPIView):
@@ -37,7 +37,7 @@ class VerifyPaymentView(generics.UpdateAPIView):
     http_method_names = ['patch']
 
     def get_queryset(self):
-        return Payment.objects.filter(unit__property__owner=self.request.user)
+        return Payment.objects.select_related('tenant', 'unit__property').filter(unit__property__owner=self.request.user)
 
     def perform_update(self, serializer):
         serializer.save(status='verified', paid_at=timezone.now())

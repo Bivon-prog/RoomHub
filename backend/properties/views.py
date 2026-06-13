@@ -25,7 +25,7 @@ class PropertyListCreateView(generics.ListCreateAPIView):
         return [permissions.IsAuthenticated()]
 
     def get_queryset(self):
-        qs = Property.objects.filter(is_available=True)
+        qs = Property.objects.select_related('owner', 'rules').prefetch_related('images', 'documents').filter(is_available=True)
         params = self.request.query_params
         if params.get('listing_type'):
             qs = qs.filter(listing_type=params['listing_type'])
@@ -55,7 +55,7 @@ class MyPropertiesView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Property.objects.filter(owner=self.request.user)
+        return Property.objects.select_related('owner', 'rules').prefetch_related('images', 'documents').filter(owner=self.request.user)
 
 
 class PropertyImageUploadView(generics.CreateAPIView):
@@ -88,11 +88,11 @@ class TenantUnitListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         if user.role == 'landlord':
-            return TenantUnit.objects.filter(property__owner=user)
-        return TenantUnit.objects.filter(tenant=user)
+            return TenantUnit.objects.select_related('tenant', 'property').filter(property__owner=user)
+        return TenantUnit.objects.select_related('tenant', 'property').filter(tenant=user)
 
 
 class TenantUnitDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = TenantUnit.objects.all()
+    queryset = TenantUnit.objects.select_related('tenant', 'property').all()
     serializer_class = TenantUnitSerializer
     permission_classes = [permissions.IsAuthenticated]

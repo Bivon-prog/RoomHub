@@ -10,8 +10,8 @@ class TicketListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         if user.role == 'landlord':
-            return Ticket.objects.filter(property__owner=user)
-        return Ticket.objects.filter(submitted_by=user)
+            return Ticket.objects.select_related('submitted_by', 'property').filter(property__owner=user)
+        return Ticket.objects.select_related('submitted_by', 'property').filter(submitted_by=user)
 
 
 class TicketDetailView(generics.RetrieveAPIView):
@@ -21,8 +21,8 @@ class TicketDetailView(generics.RetrieveAPIView):
     def get_queryset(self):
         user = self.request.user
         if user.role == 'landlord':
-            return Ticket.objects.filter(property__owner=user)
-        return Ticket.objects.filter(submitted_by=user)
+            return Ticket.objects.select_related('submitted_by', 'property').filter(property__owner=user)
+        return Ticket.objects.select_related('submitted_by', 'property').filter(submitted_by=user)
 
 
 class UpdateTicketStatusView(generics.UpdateAPIView):
@@ -32,7 +32,7 @@ class UpdateTicketStatusView(generics.UpdateAPIView):
     http_method_names = ['patch']
 
     def get_queryset(self):
-        return Ticket.objects.filter(property__owner=self.request.user)
+        return Ticket.objects.select_related('submitted_by', 'property').filter(property__owner=self.request.user)
 
     def perform_update(self, serializer):
         status = self.request.data.get('status')
