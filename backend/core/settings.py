@@ -103,4 +103,5 @@ REST_FRAMEWORK = {
 }
 
 # CORS — allow React frontend
-CORS_ALLOW_ALL_ORIGINS = DEBUG  # restrict in production
+CORS_ALLOW_ALL_ORIGINS = True
+
