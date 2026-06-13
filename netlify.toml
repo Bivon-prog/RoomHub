@@ -1,0 +1,10 @@
+[build]
+  base = "Fontend"
+  command = "npm run build"
+  publish = "dist"
+
+# React Router single-page application redirect rule
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
