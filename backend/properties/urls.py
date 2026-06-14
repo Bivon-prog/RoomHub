@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     PropertyListCreateView, PropertyDetailView, MyPropertiesView,
     PropertyImageUploadView, TenantUnitListCreateView, TenantUnitDetailView,
-    LegalDocumentView, PropertyRulesView
+    LegalDocumentView, PropertyRulesView, AdminPropertyListAPIView
 )
 
 urlpatterns = [
@@ -14,4 +14,5 @@ urlpatterns = [
     path('<int:property_id>/rules/', PropertyRulesView.as_view(), name='property-rules'),
     path('units/', TenantUnitListCreateView.as_view(), name='tenant-units'),
     path('units/<int:pk>/', TenantUnitDetailView.as_view(), name='tenant-unit-detail'),
+    path('admin/properties/', AdminPropertyListAPIView.as_view(), name='admin-property-list'),
 ]

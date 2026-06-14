@@ -6,11 +6,11 @@ from .serializers import (
 )
 
 
-class IsOwnerOrReadOnly(permissions.BasePermission):
+class IsOwnerOrAdminOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        return obj.owner == request.user
+        return obj.owner == request.user or (request.user.is_authenticated and request.user.role == 'admin')
 
 
 class PropertyListCreateView(generics.ListCreateAPIView):
@@ -47,7 +47,7 @@ class PropertyListCreateView(generics.ListCreateAPIView):
 class PropertyDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Property.objects.all()
     serializer_class = PropertySerializer
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [IsOwnerOrAdminOrReadOnly]
 
 
 class MyPropertiesView(generics.ListAPIView):
@@ -96,3 +96,14 @@ class TenantUnitDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = TenantUnit.objects.select_related('tenant', 'property').all()
     serializer_class = TenantUnitSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class AdminPropertyListAPIView(generics.ListAPIView):
+    queryset = Property.objects.select_related('owner', 'rules').prefetch_related('images', 'documents').all().order_by('-created_at')
+    serializer_class = PropertySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.role != 'admin':
+            raise permissions.PermissionDenied("Admin access required.")
+        return super().get_queryset()

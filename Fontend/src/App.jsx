@@ -18,6 +18,7 @@ import LandlordDashboard from './pages/dashboards/LandlordDashboard.jsx'
 import TenantDashboard from './pages/dashboards/TenantDashboard.jsx'
 import SellerDashboard from './pages/dashboards/SellerDashboard.jsx'
 import BuyerDashboard from './pages/dashboards/BuyerDashboard.jsx'
+import AdminDashboard from './pages/dashboards/AdminDashboard.jsx'
 import TicketForm from './pages/TicketForm'
 import TicketDetail from './pages/TicketDetail'
 import PaymentForm from './pages/PaymentForm'
@@ -63,6 +64,9 @@ export default function App() {
 
           {/* Buyer */}
           <Route path="/buyer/dashboard" element={<ProtectedRoute roles={['buyer']}><BuyerDashboard /></ProtectedRoute>} />
+
+          {/* Admin */}
+          <Route path="/admin/dashboard" element={<ProtectedRoute roles={['admin']}><AdminDashboard /></ProtectedRoute>} />
 
           {/* Shared */}
           <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
