@@ -285,6 +285,24 @@ button { cursor: pointer; border: none; font-family: inherit; font-weight: 600; 
 .help-list li strong { color: var(--dark); }
 
 /* ── RESPONSIVE ── */
+.navbar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--white);
+  cursor: pointer;
+  padding: 6px;
+}
+
+/* Horizontal scrolling for tables inside dashboards on mobile */
+.dashboard-section {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+
 @media (max-width: 1024px) {
   .navbar { padding: 0 32px; }
   .hero-content { padding: 0 32px; }
@@ -300,7 +318,37 @@ button { cursor: pointer; border: none; font-family: inherit; font-weight: 600; 
   .footer-bottom-inner { padding: 20px 32px; }
   .page { padding: 40px 32px; }
 }
+
 @media (max-width: 768px) {
+  .navbar-toggle {
+    display: block;
+  }
+  .navbar-links {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: var(--dark);
+    padding: 24px;
+    gap: 20px;
+    border-top: 1px solid var(--dark3);
+    box-shadow: var(--shadow-lg);
+  }
+  .navbar-links.active {
+    display: flex;
+  }
+  .navbar-links .btn-outline {
+    width: 100%;
+    justify-content: center;
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  .navbar-links .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
   .hero h1 { font-size: 38px; }
   .hero-stats { gap: 28px; flex-wrap: wrap; }
   .search-bar-wrap { flex-direction: column; transform: translateY(0); margin: 0 16px; border-radius: var(--radius-lg); }
